@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMD Store - Moda Masculina Oversized e Times</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variáveis de Cores */
+        :root {
+            --cor-principal: #000;
+            --cor-whatsapp: #25D366;
+            --cor-fundo-claro: #f5f5f5;
+            --cor-texto: #333;
+            --cor-texto-claro: #fff;
+            --cor-dourado: #DAA520;
+            --cor-cartao: #3b5998; /* Azul para opção de Cartão */
+        }
+
+        * { box-sizing: border-box; margin:0; padding:0; }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--cor-fundo-claro);
+            color: var(--cor-texto);
+        }
+
+        /* CABEÇALHO */
+        header {
+            background-color: var(--cor-principal);
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top:0;
+            z-index: 1000;
+        }
+
+        .logo-img { max-height:50px; }
+        .social-icons a { color:#fff; margin-left:12px; font-size:1.4em; text-decoration:none; }
+        .social-icons a:hover { color: var(--cor-whatsapp); }
+
+        /* NAVEGAÇÃO */
+        .nav-menu {
+            background-color: var(--cor-principal);
+            text-align: center;
+            padding: 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 80px; /* Para ficar abaixo do header */
+            z-index: 900;
+        }
+        .nav-menu a {
+            color: var(--cor-texto-claro);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin: 0 12px;
+        }
+        .nav-menu a:hover { color: var(--cor-whatsapp); }
+
+        /* TÍTULOS DE SEÇÃO */
+        h2 { text-align:center; margin:40px 0 20px; text-transform:uppercase; color: var(--cor-texto); }
+        
+        /* GRID PRODUTOS */
+        .produtos { display:flex; flex-wrap:wrap; justify-content:center; gap:30px; margin:20px; }
+        .produto {
+            background:#fff;
+            padding:15px;
+            border-radius:10px;
+            width:250px;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+            text-align:center;
+            transition: transform 0.3s;
+        }
+        .produto:hover { transform: translateY(-5px); }
+        /* Adicionado cursor pointer para indicar que é clicável */
+        .produto img { 
+            width:100%; 
+            height:250px; 
+            object-fit:cover; 
+            border-radius:8px; 
+            margin-bottom:10px; 
+            cursor: pointer; 
+        }
+        .produto a { text-decoration: none; display: block; } /* Faz o link da imagem ocupar a área correta */
+        .preco { 
+            font-size:1.6em; 
+            color:var(--cor-whatsapp); 
+            font-weight:900; 
+            margin-bottom: 5px; /* Reduzido para dar espaço ao seletor */
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* ESTILIZAÇÃO DO SELETOR DE TAMANHO */
+        .selecao-tamanho {
+            margin-bottom: 15px;
+        }
+        .selecao-tamanho label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .selecao-tamanho select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* BOTÕES DE AÇÃO */
+        .btn-add {
+            display:block;
+            width:100%;
+            text-align:center;
+            padding:12px;
+            background: var(--cor-dourado);
+            color:#000;
+            font-weight:bold;
+            border: none;
+            border-radius:5px;
+            cursor:pointer;
+            text-decoration:none;
+            transition: background 0.3s;
+            margin-bottom: 8px;
+        }
+        .btn-add:hover { background:#c9a222; }
+
+        /* TOAST, CARRINHO E PAGAMENTO (MANTIDOS) */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left:50%;
+            transform: translateX(-50%);
+            background: var(--cor-whatsapp);
+            color:#fff;
+            padding:12px 20px;
+            border-radius:6px;
+            font-weight:bold;
+            display:none;
+            z-index: 1500;
+        }
+
+        .carrinho {
+            position: fixed;
+            top:0;
+            right:-400px;
+            width: 350px;
+            max-width: 100%;
+            height:100%;
+            background:#fff;
+            box-shadow:-4px 0 12px rgba(0,0,0,0.2);
+            transition: right 0.3s;
+            z-index:1200;
+            display:flex;
+            flex-direction:column;
+        }
+        .carrinho.aberto { right:0; }
+        .carrinho-header { padding:15px; background: var(--cor-principal); color:#fff; display:flex; justify-content:space-between; align-items:center; }
+        .carrinho-body { flex:1; overflow-y:auto; padding:15px; }
+        .carrinho-item { display:flex; margin-bottom:12px; gap:10px; align-items:center; border-bottom: 1px solid #eee; padding-bottom: 8px;}
+        .carrinho-item img { width:60px; height:60px; object-fit:cover; border-radius:6px; }
+        .carrinho-item-details { flex:1; }
+        .carrinho-item-details p { margin:2px 0; font-size: 0.9em; }
+        .remove-item { background:#ff4d4d; border:none; color:#fff; padding:4px 6px; border-radius:4px; cursor:pointer; font-size:0.8em; }
+
+        .carrinho-footer { padding:15px; border-top:1px solid #ccc; }
+        .total { font-weight:bold; font-size: 1.2em; margin-bottom:15px; text-align: right; }
+        .btn-pagar { display:block; width:100%; padding:12px; background: var(--cor-whatsapp); color:#fff; text-align:center; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:8px; }
+        .btn-cartao { display:block; width:100%; padding:12px; background: var(--cor-cartao); color:#fff; text-align:center; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:8px; }
+        .btn-wp { display:block; width:100%; padding:12px; background:#6c757d; color:#fff; text-align:center; border-radius:6px; font-weight:bold; text-decoration:none; }
+
+        .carrinho-contador {
+            background:red;
+            color:#fff;
+            font-size:0.8em;
+            font-weight:bold;
+            padding:2px 6px;
+            border-radius:50%;
+            position:absolute;
+            top:5px;
+            right:5px;
+        }
+        .carrinho-vazio { text-align: center; color: #999; margin-top: 50px; font-style: italic; }
+
+        /* SEÇÃO PAGAMENTO */
+        .secao-pagamento { text-align:center; margin:30px 20px; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .secao-pagamento img { max-width: 150px; height: auto; border-radius:8px; margin-bottom: 15px;}
+        .secao-pagamento button { padding:10px 15px; border:none; background:var(--cor-whatsapp); color:#fff; border-radius:6px; cursor:pointer; font-weight: bold; margin-top: 10px;}
+        .secao-pagamento p { margin: 8px 0; }
+        
+        /* Estilos para o PIX manual */
+        .pix-valor-display {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--cor-principal);
+            background: var(--cor-fundo-claro);
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: inline-block;
+            border: 2px solid var(--cor-dourado);
+        }
+        .pix-instrucoes {
+            text-align: left;
+            margin-top: 20px;
+            border-top: 1px dashed #ccc;
+            padding-top: 15px;
+        }
+
+        /* Responsivo */
+        @media(max-width:600px){
+            .produto { width:90%; }
+            .carrinho{ width:100%; }
+            .nav-menu a { margin: 0 5px; font-size: 0.75em; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="social-icons">
+        <a href="https://wa.me/556191152451" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://instagram.com/imd.store01" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+    </div>
+    <img src="https://imgur.la/images/2025/10/07/Captura-de-tela-2024-11-21-205746.png" class="logo-img" alt="IMD Store Logo">
+    <div style="position:relative; cursor:pointer;" id="btnCarrinho" title="Ver Carrinho">
+        <i class="fas fa-shopping-cart fa-2x" style="color:#fff;"></i>
+        <span class="carrinho-contador" id="contadorCarrinho">0</span>
+    </div>
+</header>
+
+<nav class="nav-menu">
+    <a href="#oversized">Oversized</a>
+    <a href="#time">Camisa de Time</a>
+    <a href="#shorts">Shorts</a>
+    <a href="#pagamento">Pagamento</a>
+</nav>
+
+<h2 id="oversized">Oversized</h2>
+<div class="produtos">
+    <div class="produto" data-nome="Oversized Essencial" data-preco="79.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R8000-42c9c268d03723703.jpeg">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R8000-42c9c268d03723703.jpeg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R8000-42c9c268d03723703.jpeg" alt="Oversized Essencial">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-1">Tamanho:</label>
+            <select id="tamanho-oversized-1" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Algodão Pima" data-preco="79.90" data-img="https://imgur.la/images/2025/10/07/TAM-M-R8000.jpg">
+        <a href="https://imgur.la/images/2025/10/07/TAM-M-R8000.jpg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-M-R8000.jpg" alt="Oversized Algodão Pima">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-2">Tamanho:</label>
+            <select id="tamanho-oversized-2" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Mescla" data-preco="79.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R8000-1dab33d75401d8cff.jpeg">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R8000-1dab33d75401d8cff.jpeg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R8000-1dab33d75401d8cff.jpeg" alt="Oversized Mescla">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-3">Tamanho:</label>
+            <select id="tamanho-oversized-3" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Camisa Mormai" data-preco="79.90" data-img="https://imgur.la/images/2025/10/07/TAM-M-R8000-3.jpg">
+        <a href="https://imgur.la/images/2025/10/07/TAM-M-R8000-3.jpg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-M-R8000-3.jpg" alt="Oversized Estampada">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-4">Tamanho:</label>
+            <select id="tamanho-oversized-4" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+
+    <div class="produto" data-nome="Oversized Nova 1 (Preta)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-16.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-16.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-16.png" alt="Oversized Nova 1 (Preta)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-5">Tamanho:</label>
+            <select id="tamanho-oversized-5" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 2 (Branca)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-19.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-19.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-19.png" alt="Oversized Nova 2 (Branca)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-6">Tamanho:</label>
+            <select id="tamanho-oversized-6" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 3 (Mescla)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-15.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-15.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-15.png" alt="Oversized Nova 3 (Mescla)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-7">Tamanho:</label>
+            <select id="tamanho-oversized-7" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 4 (Bege)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-13.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-13.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-13.png" alt="Oversized Nova 4 (Bege)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-8">Tamanho:</label>
+            <select id="tamanho-oversized-8" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G">G</option>
+                <option value="GG" selected>GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 5 (Estampa Costas)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-3.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-3.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-3.png" alt="Oversized Nova 5 (Estampa Costas)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-9">Tamanho:</label>
+            <select id="tamanho-oversized-9" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 6 (Gráfico Verde)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-7.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-7.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-7.png" alt="Oversized Nova 6 (Gráfico Verde)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-10">Tamanho:</label>
+            <select id="tamanho-oversized-10" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Oversized Nova 7 (Cinza Urbana)" data-preco="79.90" data-img="https://www.imgur.la/images/2025/10/28/imd-5.png">
+        <a href="https://www.imgur.la/images/2025/10/28/imd-5.png" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/imd-5.png" alt="Oversized Nova 7 (Cinza Urbana)">
+        </a>
+        <p class="preco">R$ 79,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-oversized-11">Tamanho:</label>
+            <select id="tamanho-oversized-11" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+</div>
+
+<h2 id="time">Camisa de Time</h2>
+<div class="produtos">
+    <div class="produto" data-nome="Time Nacional A" data-preco="139.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R13990-4.png">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R13990-4.png" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R13990-4.png" alt="Camisa de Time Nacional A">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-1">Tamanho:</label>
+            <select id="tamanho-time-1" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Edição Europa" data-preco="139.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R13990-2.png">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R13990-2.png" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R13990-2.png" alt="Camisa de Time Edição Europa">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-2">Tamanho:</label>
+            <select id="tamanho-time-2" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Nacional B" data-preco="139.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R13990.png">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R13990.png" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R13990.png" alt="Camisa de Time Nacional B">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-3">Tamanho:</label>
+            <select id="tamanho-time-3" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Retrô" data-preco="139.90" data-img="https://imgur.la/images/2025/10/07/TAM-G-R13990-5.png">
+        <a href="https://imgur.la/images/2025/10/07/TAM-G-R13990-5.png" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/TAM-G-R13990-5.png" alt="Camisa de Time Retrô">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-4">Tamanho:</label>
+            <select id="tamanho-time-4" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+
+    <div class="produto" data-nome="Time Nova 1 (Preta)" data-preco="139.90" data-img="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0147.jpg">
+        <a href="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0147.jpg" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0147.jpg" alt="Camisa de Time Nova 1 (Preta)">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-5">Tamanho:</label>
+            <select id="tamanho-time-5" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Nova 2 (Branca)" data-preco="139.90" data-img="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0145.jpg">
+        <a href="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0145.jpg" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0145.jpg" alt="Camisa de Time Nova 2 (Branca)">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-6">Tamanho:</label>
+            <select id="tamanho-time-6" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M" selected>M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Nova 3 (Azul Escuro)" data-preco="139.90" data-img="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0146.jpg">
+        <a href="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0146.jpg" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0146.jpg" alt="Camisa de Time Nova 3 (Azul Escuro)">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-7">Tamanho:</label>
+            <select id="tamanho-time-7" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Time Nova 4 (Vermelha)" data-preco="139.90" data-img="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0144.jpg">
+        <a href="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0144.jpg" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/IMG-20251027-WA0144.jpg" alt="Camisa de Time Nova 4 (Vermelha)">
+        </a>
+        <p class="preco">R$ 139,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-time-8">Tamanho:</label>
+            <select id="tamanho-time-8" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G">G</option>
+                <option value="GG" selected>GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+</div>
+
+<h2 id="shorts">Shorts</h2>
+<div class="produtos">
+    <div class="produto" data-nome="Shorts Moletom Cinza" data-preco="59.90" data-img="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-2.jpeg">
+        <a href="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-2.jpeg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-2.jpeg" alt="Shorts Moletom Cinza">
+        </a>
+        <p class="preco">R$ 59,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-shorts-1">Tamanho:</label>
+            <select id="tamanho-shorts-1" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+    <div class="produto" data-nome="Shorts Tactel Liso" data-preco="59.90" data-img="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-1.jpeg">
+        <a href="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-1.jpeg" target="_blank">
+            <img src="https://imgur.la/images/2025/10/07/WhatsApp-Image-2025-10-06-at-18.47.50-1.jpeg" alt="Shorts Tactel Liso">
+        </a>
+        <p class="preco">R$ 59,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-shorts-2">Tamanho:</label>
+            <select id="tamanho-shorts-2" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+
+    <div class="produto" data-nome="Shorts Novo Preto" data-preco="59.90" data-img="https://www.imgur.la/images/2025/10/28/WhatsApp-Image-2025-10-06-at-18.47.50.jpeg">
+        <a href="https://www.imgur.la/images/2025/10/28/WhatsApp-Image-2025-10-06-at-18.47.50.jpeg" target="_blank">
+            <img src="https://www.imgur.la/images/2025/10/28/WhatsApp-Image-2025-10-06-at-18.47.50.jpeg" alt="Shorts Novo Preto">
+        </a>
+        <p class="preco">R$ 59,90</p>
+        <div class="selecao-tamanho">
+            <label for="tamanho-shorts-3">Tamanho:</label>
+            <select id="tamanho-shorts-3" class="select-tamanho">
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G" selected>G</option>
+                <option value="GG">GG</option>
+            </select>
+        </div>
+        <button class="btn-add">Adicionar ao carrinho</button>
+    </div>
+</div>
+
+<div class="toast" id="toast">Produto adicionado com sucesso ✅</div>
+
+<div class="carrinho" id="carrinho">
+    <div class="carrinho-header">
+        <span>🛒 Seu Carrinho</span>
+        <button id="fecharCarrinho" style="background:none;color:#fff;border:none;font-size:1.5em;cursor:pointer;">&times;</button>
+    </div>
+    <div class="carrinho-body" id="carrinhoBody">
+        <p class="carrinho-vazio">Seu carrinho está vazio.</p>
+    </div>
+    <div class="carrinho-footer">
+        <p class="total">Total: R$ <span id="totalCarrinho">0.00</span></p>
+        <a class="btn-pagar" href="#" id="btnFinalizarPix" onclick="return finalizarCompra('pix')">Finalizar Pedido com PIX</a>
+        <a class="btn-cartao" href="#" id="btnFinalizarCartao" onclick="return finalizarCompra('cartao')">Pagar com Cartão (via WhatsApp)</a>
+        <button class="btn-wp" onclick="limparCarrinho()">Limpar Carrinho</button>
+    </div>
+</div>
+
+<div id="pagamento">
+    <h2 style="margin-top:60px;">Pagamento PIX</h2>
+    <div class="secao-pagamento">
+        
+        <p style="font-size: 1.1em;">Seu Total a Pagar é:</p>
+        <div class="pix-valor-display">R$ <span id="totalPagamentoPix">0,00</span></div>
+        
+        <p>Chave Pix (Copia e Cola): <strong>61981264931</strong></p>
+        <button onclick="copiarPix()">Copiar chave Pix (para Copia e Cola) ✅</button>
+        
+        <div class="pix-instrucoes">
+            <p style="font-weight: bold; color: var(--cor-principal);">Siga os passos no aplicativo do seu banco:</p>
+            <p>1. Vá na área **PIX** e escolha a opção **Chave/Copia e Cola**.</p>
+            <p>2. Cole a chave <strong>61981264931</strong>.</p>
+            <p>3. No campo do valor, **digite o valor total exato** que está em destaque acima.</p>
+        </div>
+        
+        <p style="margin-top: 25px; font-weight: bold; color: var(--cor-principal); border-top: 1px solid #ccc; padding-top: 15px;">
+            APÓS O PAGAMENTO, CLIQUE NO BOTÃO WHATSAPP ABAIXO PARA ENVIAR O COMPROVANTE E SEU ENDEREÇO DE ENTREGA.
+        </p>
+        <a class="btn-pagar" href="https://wa.me/556191152451?text=Ol%C3%A1,%20meu%20pedido%20PIX%20foi%20pago.%20Aqui%20est%C3%A1%20o%20comprovante%20e%20o%20resumo%20do%20meu%20pedido!" target="_blank" style="margin-top: 10px;" id="btnWhatsAppPix">Enviar Comprovante e Dados de Entrega</a>
+    </div>
+</div>
+
+<footer>
+    Siga-nos no Instagram: <a href="https://instagram.com/imd.store01" target="_blank">@imd.store01</a>
+</footer>
+
+<script>
+    let carrinho = [];
+    const carrinhoBody = document.getElementById('carrinhoBody');
+    const contadorCarrinho = document.getElementById('contadorCarrinho');
+    const carrinhoDiv = document.getElementById('carrinho');
+    const totalCarrinhoSpan = document.getElementById('totalCarrinho');
+    const totalPagamentoPixSpan = document.getElementById('totalPagamentoPix');
+    const btnWhatsAppPix = document.getElementById('btnWhatsAppPix');
+    
+    // Função para calcular o total e renderizar a lista
+    function atualizarCarrinho() {
+        carrinhoBody.innerHTML = '';
+        let total = 0;
+        
+        if (carrinho.length === 0) {
+            carrinhoBody.innerHTML = '<p class="carrinho-vazio">Seu carrinho está vazio.</p>';
+            totalCarrinhoSpan.textContent = '0.00';
+            totalPagamentoPixSpan.textContent = '0,00';
+            btnWhatsAppPix.href = "https://wa.me/556191152451?text=Ol%C3%A1,%20meu%20pedido%20PIX%20foi%20pago.%20Aqui%20est%C3%A1%20o%20comprovante%20e%20o%20resumo%20do%20meu%20pedido!"; // Reseta a mensagem
+            return;
+        }
+
+        carrinho.forEach((item, index) => {
+            total += parseFloat(item.preco);
+            const div = document.createElement('div');
+            div.className = 'carrinho-item';
+            div.innerHTML = `
+                <img src="${item.img}" alt="${item.nome}">
+                <div class="carrinho-item-details">
+                    <p><strong>${item.nome}</strong></p>
+                    <p>Tamanho: <strong>${item.tamanho}</strong></p>
+                    <p>R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')}</p>
+                </div>
+                <button class="remove-item" onclick="removerItem(${index})">&times;</button>
+            `;
+            carrinhoBody.appendChild(div);
+        });
+
+        const totalFormatado = total.toFixed(2).replace('.', ',');
+        totalCarrinhoSpan.textContent = totalFormatado;
+        totalPagamentoPixSpan.textContent = totalFormatado; // Atualiza o total na seção Pix
+        contadorCarrinho.textContent = carrinho.length;
+
+        // Atualiza a mensagem do WhatsApp para Pix
+        atualizarLinkWhatsAppPix();
+    }
+
+    // Adicionar item (mantido)
+    document.querySelectorAll('.btn-add').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const produto = e.target.closest('.produto');
+            const selectTamanho = produto.querySelector('.select-tamanho');
+            
+            const tamanhoSelecionado = selectTamanho ? selectTamanho.value : 'Tamanho Único'; 
+            
+            const item = {
+                nome: produto.dataset.nome,
+                preco: produto.dataset.preco,
+                img: produto.dataset.img,
+                tamanho: tamanhoSelecionado
+            };
+            carrinho.push(item);
+            atualizarCarrinho();
+
+            // Mostra o Toast (confirmação)
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        });
+    });
+
+    // Remover item (mantido)
+    function removerItem(index) {
+        carrinho.splice(index, 1);
+        atualizarCarrinho();
+    }
+
+    // Limpar Carrinho (mantido)
+    function limparCarrinho() {
+        carrinho = [];
+        atualizarCarrinho();
+        alert('Carrinho limpo!');
+    }
+
+    // Abrir/Fechar Carrinho (mantido)
+    document.getElementById('btnCarrinho').addEventListener('click', () => { carrinhoDiv.classList.toggle('aberto'); });
+    document.getElementById('fecharCarrinho').addEventListener('click', () => { carrinhoDiv.classList.remove('aberto'); });
+
+    // PIX Copia e Cola
+    function copiarPix() {
+        navigator.clipboard.writeText('61981264931');
+        alert('Chave Pix copiada (para Copia e Cola) ✅');
+    }
+
+    // Função para atualizar o link do WhatsApp para PIX (inclui o resumo do pedido)
+    function atualizarLinkWhatsAppPix() {
+        if (carrinho.length === 0) return;
+        
+        let total = carrinho.reduce((acc, item) => acc + parseFloat(item.preco), 0).toFixed(2);
+
+        let listaItens = carrinho.map((item, index) => {
+            return `${index + 1}. ${item.nome} - Tam: ${item.tamanho} (R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')})`;
+        }).join('%0A'); // %0A é a quebra de linha no URL do WhatsApp
+
+        let mensagemPix = `Ol%C3%A1,%20gostaria%20de%20enviar%20o%20comprovante%20do%20meu%20pedido%20PIX!%0A%0A*RESUMO%20DO%20PEDIDO*%0A*PRODUTOS:*%0A${listaItens}%0A%0A*TOTAL%20PAGO:* R$ ${total.replace('.', ',')}%0A%0A*ENDERE%C3%87O%20DE%20ENTREGA:* (Por%20favor,%20preencha%20aqui%20o%20seu%20endere%C3%A7o)`;
+
+        btnWhatsAppPix.href = `https://wa.me/556191152451?text=${mensagemPix}`;
+    }
+
+    // Função de finalização que gera a mensagem no WhatsApp
+    function finalizarCompra(tipo) {
+        if (carrinho.length === 0) {
+            alert("Seu carrinho está vazio. Adicione um produto antes de finalizar.");
+            return false;
+        }
+
+        if (tipo === 'pix') {
+            // Se for PIX, direciona para a seção de pagamento PIX e atualiza o valor
+            atualizarCarrinho(); // Garante que o valor está atualizado na seção
+            window.location.href = '#pagamento';
+            carrinhoDiv.classList.remove('aberto');
+            return false;
+        } else if (tipo === 'cartao') {
+            let total = carrinho.reduce((acc, item) => acc + parseFloat(item.preco), 0).toFixed(2);
+            let listaItens = carrinho.map((item, index) => {
+                return `${index + 1}. ${item.nome} - Tam: ${item.tamanho} (R$ ${parseFloat(item.preco).toFixed(2).replace('.', ',')})`;
+            }).join('%0A');
+
+            let mensagemCartao = `Ol%C3%A1,%20gostaria%20de%20finalizar%20a%20compra%20dos%20seguintes%20itens%20com%20Cart%C3%A3o:%0A%0A*PRODUTOS:*%0A${listaItens}%0A%0A*TOTAL:* R$ ${total.replace('.', ',')}%0A%0APor%20favor,%20me%20envie%20o%20link%20de%20pagamento%20do%20Mercado%20Pago%20para%20o%20valor%20total.`;
+            window.open(`https://wa.me/556191152451?text=${mensagemCartao}`, '_blank');
+            return false;
+        }
+    }
+
+    // Inicializa o carrinho ao carregar
+    atualizarCarrinho();
+</script>
+
+</body>
+</html>
