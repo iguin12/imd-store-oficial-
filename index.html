@@ -368,7 +368,7 @@
             <div class="bandeiras" aria-hidden="true">
                 <i class="fa-brands fa-cc-visa"></i><i class="fa-brands fa-cc-mastercard"></i><i class="fa-solid fa-credit-card"></i>
             </div>
-            <p>Crédito ou débito, com pagamento por <strong>link seguro do Mercado Pago</strong>.</p>
+            <p>Crédito ou débito, com pagamento por <strong>link seguro do InfinitePay</strong>.</p>
 
             <div class="instrucoes">
                 <p><strong>Como funciona:</strong></p>
@@ -376,12 +376,12 @@
                     <li>Adicione as peças ao carrinho e toque em <strong>Pagar com Cartão</strong>.</li>
                     <li>Escolha crédito ou débito e o parcelamento que prefere.</li>
                     <li>Seu pedido vai pronto para o nosso WhatsApp.</li>
-                    <li>Você recebe o <strong>link de pagamento</strong> e paga direto no ambiente seguro do Mercado Pago.</li>
+                    <li>Você recebe o <strong>link de pagamento</strong> e paga direto no ambiente seguro do InfinitePay.</li>
                 </ol>
             </div>
             <div class="aviso-seguro" style="margin-top:14px; text-align:left;">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Nunca pedimos os dados do seu cartão pelo WhatsApp. Você digita esses dados <strong>somente</strong> na página do Mercado Pago.</span>
+                <span>Nunca pedimos os dados do seu cartão pelo WhatsApp. Você digita esses dados <strong>somente</strong> na página do InfinitePay.</span>
             </div>
             <button class="btn-cartao" onclick="abrirModalCartao()"><i class="fa-solid fa-credit-card"></i> Pagar com Cartão</button>
         </div>
@@ -441,7 +441,7 @@
                 <div class="campo" id="campoParcelas">
                     <label for="parcelas">Parcelamento desejado</label>
                     <select id="parcelas"></select>
-                    <p class="ajuda">O valor final de cada parcela é informado no link do Mercado Pago.</p>
+                    <p class="ajuda">O valor final de cada parcela é informado no link do InfinitePay.</p>
                 </div>
 
                 <div class="campo" id="campoNome">
@@ -456,7 +456,7 @@
 
                 <div class="aviso-seguro">
                     <i class="fa-solid fa-lock"></i>
-                    <span>Ao continuar, você será levado ao WhatsApp da IMD Store com o pedido pronto. Em seguida enviamos um <strong>link de pagamento seguro do Mercado Pago</strong>. Os dados do cartão são digitados somente lá, nunca no WhatsApp.</span>
+                    <span>Ao continuar, você será levado ao WhatsApp da IMD Store com o pedido pronto. Em seguida enviamos um <strong>link de pagamento seguro do InfinitePay</strong>. Os dados do cartão são digitados somente lá, nunca no WhatsApp.</span>
                 </div>
 
                 <button type="submit" class="btn-pagar"><i class="fab fa-whatsapp"></i> Enviar pedido e receber o link</button>
@@ -996,7 +996,7 @@ function mensagemCartao({ tipo, parcelas, nome, entrega }) {
         '',
         `*Entrega:* ${entrega || '(vou informar o endereço por aqui)'}`,
         '',
-        'Por favor, me envie o *link de pagamento seguro do Mercado Pago* para concluir. Obrigado!'
+        'Por favor, me envie o *link de pagamento seguro do InfinitePay* para concluir. Obrigado!'
     ].join('\n');
 }
 
